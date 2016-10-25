@@ -1,0 +1,79 @@
+#!/usr/bin/env ruby
+# vim: set expandtab sw=2 ts=2:ft=ruby
+
+require 'optparse'
+require 'sysrandom'
+require 'pwqgen'
+require 'highline'
+
+options = {}
+# defaults
+options[:length] = 4                        # default length
+options[:separators] = Pwqgen::SEPARATORS   # default separators
+options[:random_capitalize] = true
+# if Sysrandom is not available, SecureRandom could be used instead, but not automatically
+options[:random] = Sysrandom.method(:random_bytes)
+
+# for the -k option
+skeyfile = ENV['SKEYFILE'] ? ENV['SKEYFILE'] : File.join(ENV['HOME'], '.skey')
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: #{File.basename(__FILE__)} [OPTIONS]\n"
+  opts.on('-k', '--key STRING', "use hmac generator. key from #{skeyfile}") do |s|
+    options[:key_from_skeyfile] = true
+    options[:arg_string] = s
+  end
+  opts.on('-p', '--prompt-key STRING', 'use hmac generator. key from prompt') do |s|
+    options[:key_from_prompt] = true
+    options[:arg_string] = s
+  end
+  opts.on('-n', '--numeric-separators', 'use restricted separator list - numbers only') do
+    options[:separators] = Pwqgen::NUMERIC_SEPARATORS
+  end
+  opts.on('-s', '--never-capitalize', 'never capitalize') { options[:random_capitalize] = false }
+  opts.on('-l', '--length LENGTH', Integer, 'length of passphrase in words (minimum 3)') { |l| options[:length] = l.to_i }
+  opts.on('-b', '--bits LENGTH', Integer, 'approximate desired entropy (overrides -l)') { |b| options[:bits] = b.to_i }
+  opts.on('-v', '--version', 'send version number to stdout') do
+    puts Pwqgen::VERSION
+    exit 0
+  end
+  opts.on_tail('-h', '--help', 'Show this message') do
+    $stderr.puts opts
+    exit 1
+  end
+end.parse! # OptionParser
+
+if options[:key_from_prompt] || options[:key_from_skeyfile]
+  key = nil
+  case
+  when options[:key_from_skeyfile]
+    begin
+      key = ::IO.read(skeyfile, encoding: 'ASCII-8BIT')
+    rescue => e
+      raise "failed to read #{skeyfile}. #{e.inspect}"
+    end
+  when options[:key_from_prompt]
+    key = HighLine.new($stdin, $stderr).ask('Passphrase: ') { |q| q.echo = false }
+  else
+    raise 'internal error - how did we get here?'
+  end
+  options[:random] = Pwqgen::FakeRandom.new(options[:arg_string], key).method(:random_bytes)
+end
+
+if options[:bits] # overrides -l
+  bits_per_separator = Math.log(options[:separators].length, 2)
+  bits_per_word = options[:random_capitalize] ? 13.0 : 12.0
+  l = (Float(options[:bits]) + bits_per_separator) / (bits_per_word + bits_per_separator)
+  options[:length] = l.ceil
+end
+
+# minimum length is 3 - reference default minimum password length of 11 in passwdqc_parse.c
+# the words in the wordlist are all at least 3 characters
+options[:length] = 3 if options[:length] < 3
+
+puts Pwqgen.pwqgen(
+  n_words:            options[:length],
+  random_generator:   options[:random],
+  separators:         options[:separators],
+  random_capitalize:  options[:random_capitalize]
+)

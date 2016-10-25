@@ -1,0 +1,17 @@
+# vim: set expandtab sw=2 ts=2:ft=ruby
+Metrics/LineLength:
+  Max: 132
+AllCops:
+  TargetRubyVersion: 2.1
+Style/FormatString:
+  Enabled: false
+Metrics/CyclomaticComplexity:
+  Enabled: false
+Metrics/MethodLength:
+  Max: 25
+Metrics/PerceivedComplexity:
+  Enabled: false
+Style/EmptyCaseCondition:
+  Enabled: false
+Metrics/AbcSize:
+  Enabled: false
