@@ -58,7 +58,7 @@ describe Pwqgen do
     end
 
     context 'pwqgen with FakeRandom generator' do
-      it 'returns Basket$aroma7there_crag*invoke' do
+      it 'returns cider$handle9blood!Dinghy5vain' do
         expect(Pwqgen.pwqgen(n_words: 5, random_generator: Pwqgen::FakeRandom.new('string', 'very secret key').method(:random_bytes))).to \
           eql('cider$handle9blood!Dinghy5vain')
       end
