@@ -39,7 +39,7 @@ describe Pwqgen do
         word = Pwqgen.pwqgen(
           n_words: 4,
           random_generator: proc { |x| "\x01\xFF"[0..x] },
-          random_capitalize: true,
+          random_capitalize: true
         )
         expect(word).to eql('Uproar_Uproar_Uproar_Uproar')
       end
@@ -47,20 +47,22 @@ describe Pwqgen do
 
     context 'Securerandom generator NUMERIC_SEPARATORS' do
       it 'contains 4 words separated by numeric separators when NUMERIC_SEPARATORS is specified' do
-        expect(Pwqgen.pwqgen(n_words: 4, separators: Pwqgen::NUMERIC_SEPARATORS)).to match('([A-Za-z][a-z]{2,}\d){3}[A-Za-z][a-z]{2,}')
+        expect(Pwqgen.pwqgen(n_words: 4, separators: Pwqgen::NUMERIC_SEPARATORS)).to \
+          match('([A-Za-z][a-z]{2,}\d){3}[A-Za-z][a-z]{2,}')
       end
     end
 
     context 'Securerandom generator' do
       it 'contains 5 words separated by separators when SEPARATORS is specified' do
-        expect(Pwqgen.pwqgen(n_words: 5, separators: Pwqgen::NUMERIC_SEPARATORS)).to match('([A-Za-z][a-z]{2,}[-_!$&*+=23456789]){4}[A-Za-z][a-z]{2,}')
+        expect(Pwqgen.pwqgen(n_words: 5, separators: Pwqgen::NUMERIC_SEPARATORS)).to \
+          match('([A-Za-z][a-z]{2,}[-_!$&*+=23456789]){4}[A-Za-z][a-z]{2,}')
       end
     end
 
     context 'pwqgen with FakeRandom generator' do
       it 'returns cider$handle9blood!Dinghy5vain' do
-        expect(Pwqgen.pwqgen(n_words: 5, random_generator: Pwqgen::FakeRandom.new('string', 'very secret key').method(:random_bytes))).to \
-          eql('cider$handle9blood!Dinghy5vain')
+        expect(Pwqgen.pwqgen(n_words: 5, random_generator: Pwqgen::FakeRandom.new('string', 'very secret key')\
+          .method(:random_bytes))).to eql('cider$handle9blood!Dinghy5vain')
       end
     end
 

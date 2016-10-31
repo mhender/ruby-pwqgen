@@ -13,9 +13,9 @@ require 'bundler/gem_tasks'
 
 RSpec::Core::RakeTask.new(:test)
 
-task :default => [ :cop, :test, :build ]
+task :default => [:cop, :test, :build]
 
 desc 'run rubocop'
 task :cop do
-  sh 'bundle exec rubocop bin/pwqgen lib/*.rb lib/pwqgen/*.rb'
+  sh 'bundle exec rubocop bin/pwqgen lib/*.rb lib/pwqgen/*.rb spec/*.rb'
 end
