@@ -65,6 +65,7 @@ module Pwqgen
     end
 
     # if n is a power of 2, return log2(n), else return nil
+    #
     # Arguments:
     #  n: (Integer)
     def log2(n)
