@@ -10,23 +10,6 @@ module Pwqgen
   NUMERIC_SEPARATORS = '23456789'.each_char.to_a # less entropy, but for sites that cannot use chatacters like _-, etc.
 
   class << self
-    # for calculating base 2 log without any worry about floating point errors
-    LOG2_TABLE = {
-      1 => 0,
-      2 => 1,
-      4 => 2,
-      8 => 3,
-      16 => 4,
-      32 => 5,
-      64 => 6,
-      128 => 7,
-      256 => 8,
-      512 => 9,
-      1024 => 10,
-      2048 => 11,
-      4096 => 12
-    }.freeze
-
     # Pwqgen.pwqgen - generate a random passphrase using the pwqgen algorithm
     #
     # Arguments:
@@ -70,7 +53,7 @@ module Pwqgen
       raise ArgumentError, "invalid random_generator: #{random_generator.inspect}" unless random_generator.respond_to? :call
       raise ArgumentError, "separators must be Array of length 2**n n<=12, of one characters strings: #{separators.inspect}" \
         unless (separators.is_a? Array) && separators.inject(true) { |a, e| a && (e.is_a? String) && e.length == 1 } \
-        && LOG2_TABLE[separators.length]
+        && log2(separators.length)
 
       random_separators = Array.new(n_words - 1) { random_separator(random_generator: random_generator, separators: separators) }
       random_words = Array.new(n_words) { random_word(random_generator: random_generator, random_capitalize: random_capitalize) }
@@ -79,6 +62,29 @@ module Pwqgen
       random_words.inject('') do |a, e|
         a + e + random_separators.shift.to_s
       end
+    end
+
+    # if n is a power of 2, return log2(n), else return nil
+    # Arguments:
+    #  n: (Integer)
+    def log2(n)
+      return nil if n <= 0
+
+      # return nil unless n is a power of 2
+      return nil unless (n & (n - 1)).zero?
+
+      bits = 0
+
+      while n > 255
+        n >>= 8
+        bits += 8
+      end
+
+      while n > 0
+        n >>= 1
+        bits += 1
+      end
+      bits - 1
     end
 
     private
@@ -98,14 +104,14 @@ module Pwqgen
     # generate a single word "randomly" chosen from WORDSET
     # with the option to capitalize "randomly"
     def random_word(random_generator:, random_capitalize: true) # :nodoc:
-      random_word = WORDSET[random_bits(random_generator: random_generator, n_bits: LOG2_TABLE[WORDSET.length])].dup
+      random_word = WORDSET[random_bits(random_generator: random_generator, n_bits: log2(WORDSET.length))].dup
       random_word.capitalize! if random_capitalize && (random_bits(random_generator: random_generator, n_bits: 1) == 1)
       random_word
     end
 
     # generate a separator "randomly" chosen from separators
     def random_separator(random_generator:, separators:)
-      separators[random_bits(random_generator: random_generator, n_bits: LOG2_TABLE[separators.length])]
+      separators[random_bits(random_generator: random_generator, n_bits: log2(separators.length))]
     end
   end
 end

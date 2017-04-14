@@ -2,6 +2,39 @@
 require 'pwqgen'
 
 describe Pwqgen do
+  describe '.log2' do
+    context 'nil returns' do
+      it 'returns nil for 12' do
+        expect(Pwqgen.log2(12)).to eql(nil)
+      end
+      it 'returns nil for -1' do
+        expect(Pwqgen.log2(-1)).to eql(nil)
+      end
+      it 'returns nil for 0' do
+        expect(Pwqgen.log2(0)).to eql(nil)
+      end
+    end
+    context 'log base 2 of powers of 2' do
+      it 'returns 0 for 1' do
+        expect(Pwqgen.log2(1)).to eql(0)
+      end
+      it 'returns 12 for 4096' do
+        expect(Pwqgen.log2(4096)).to eql(12)
+      end
+      it 'returns 3 for 8' do
+        expect(Pwqgen.log2(8)).to eql(3)
+      end
+      it 'returns 4 for 16' do
+        expect(Pwqgen.log2(16)).to eql(4)
+      end
+      it 'returns 16 for 65536' do
+        expect(Pwqgen.log2(65_536)).to eql(16)
+      end
+      it 'returns 9 for 512' do
+        expect(Pwqgen.log2(512)).to eql(9)
+      end
+    end
+  end
   describe '.pwqgen' do
     context 'fixed generator 0' do
       it 'returns adam-adam-adam-adam with 4 words - defaults' do
