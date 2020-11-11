@@ -15,8 +15,8 @@ Gem::Specification.new do |s|
   s.require_paths = %w(lib)
   s.executables = %w(pwqgen)
   s.add_runtime_dependency('sysrandom', '~> 1')
-  s.add_runtime_dependency('highline', '~> 1')
+  s.add_runtime_dependency('highline', '~> 2')
   s.add_development_dependency('rspec', '~> 3')
   s.add_development_dependency('rubocop', '~> 0')
-  s.add_development_dependency('rake', '~> 11')
+  s.add_development_dependency('rake', '~> 12')
 end
