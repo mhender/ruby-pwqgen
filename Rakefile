@@ -10,7 +10,7 @@
 #
 require 'rspec/core/rake_task'
 #require 'bundler/gem_tasks'
-require "bundler/geminabox/gem_tasks"
+require "bundler_geminabox/gem_tasks"
 
 RSpec::Core::RakeTask.new(:test)
 
